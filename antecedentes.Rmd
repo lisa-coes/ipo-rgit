@@ -1,0 +1,12 @@
+---
+title: "antecedentes"
+author: "Equipo Legitimidad"
+date: "6/1/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Este es el ejemplo del taller
