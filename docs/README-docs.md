@@ -1,3 +1,3 @@
 # docs
 
-- Aquí van todos los documentos de texto
+- Aquí van todos los documentos de texto y antecedentes.
