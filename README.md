@@ -1,6 +1,6 @@
 # taller-git
 
-**Autor**: Julio César Iturra Sanhueza
+**Autor**: Julio César Iturra Sanhueza.
 
 ## Estructura del repositorio:
 ```
