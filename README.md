@@ -1,3 +1,3 @@
 # taller-git
 
-Autor: Julio César Iturra Sanhueza
+**Autor**: Julio César Iturra Sanhueza
