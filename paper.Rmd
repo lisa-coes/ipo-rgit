@@ -35,13 +35,6 @@ header-includes:
   - \usepackage{threeparttable}
 ---
 
-```{r eval=FALSE, include=FALSE}
-# for render in pdf run rmarkdown::render_site("docs/paper.Rmd", output_format = "all")
-# clean #in the yml
-rmarkdown::render("paper.Rmd", output_format = "bookdown::pdf_document2")
-rmarkdown::render("paper.Rmd", output_format = "bookdown::html_document2")
-```
-
 ```{r setup, include=FALSE}
 pacman::p_load(knitr, kableExtra, dplyr, ggplot2,sjmisc,texreg) # librerias
 knitr::opts_chunk$set(warning = FALSE,message = FALSE, cache = FALSE,
