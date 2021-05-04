@@ -7,7 +7,9 @@
 │   LICENSE
 │   README.md
 │   taller-git.Rproj
-│   paper.Rmd
+│
+├───docs
+│       README-docs.md
 │
 ├───input
 │       README-input.md

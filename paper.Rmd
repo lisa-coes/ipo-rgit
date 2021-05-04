@@ -1,0 +1,173 @@
+---
+title: "Lorem ipsum dolor sit amet"
+css: "input/css/custom.css"
+linestretch: '1.5'
+link-citations: yes
+author: "T. Triviño"
+abstract: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Ut enimad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+output:
+  bookdown::html_document2:
+    number_sections: false
+  bookdown::pdf_document2:
+    template: null
+    toc: false
+linkcolor: blue
+bibliography: input/bib/library.bib
+editor_options:
+  chunk_output_type: console
+geometry: margin=0.78in
+header-includes:
+  # - \usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
+  - \usepackage{times}           # Times New Roman
+  - \usepackage{caption}
+  - \captionsetup[figure, table]{labelfont={bf},labelformat={default},labelsep=period}
+  - \usepackage{graphicx}
+  - \usepackage{float}
+  - \usepackage{booktabs}
+  - \usepackage{longtable}
+  - \usepackage{array}
+  - \usepackage{multirow}
+  - \usepackage{wrapfig}
+  - \usepackage{float}
+  - \usepackage{colortbl}
+  - \usepackage{pdflscape}
+  - \usepackage{tabu}
+  - \usepackage{threeparttable}
+---
+
+```{r eval=FALSE, include=FALSE}
+# for render in pdf run rmarkdown::render_site("docs/paper.Rmd", output_format = "all")
+# clean #in the yml
+rmarkdown::render("paper.Rmd", output_format = "bookdown::pdf_document2")
+rmarkdown::render("paper.Rmd", output_format = "bookdown::html_document2")
+```
+
+```{r setup, include=FALSE}
+pacman::p_load(knitr, kableExtra, dplyr, ggplot2,sjmisc,texreg) # librerias
+knitr::opts_chunk$set(warning = FALSE,message = FALSE, cache = FALSE,
+                      out.width = '85%',
+                      fig.pos= "H", 
+                      echo = FALSE)
+options(scipen=999)
+rm(list=ls())
+options(knitr.kable.NA = '')
+options(knitr.graphics.error = FALSE)
+# Sys.setlocale("LC_ALL", "ES_ES.UTF-8")
+
+table_format = if(is_html_output()) {
+  "html"
+} else if(is_latex_output()) {
+  "latex"
+}
+
+table_format2 = if(is_html_output()) {
+  T
+} else if(is_latex_output()) {
+  F
+}
+```
+
+
+# Introducción
+
+
+
+## Datos
+
+
+## Variables
+
+
+## Métodos
+
+
+# Resultados
+
+
+```{r biscuits, echo=FALSE, fig.cap = "Relación entre biscuits y tea", fig.align='center',fig.width=12,fig.height=10,out.width='80%'}
+tea <- rnorm(100)
+biscuits <- tea + rnorm(100, 0, 1.3)
+data <- data.frame(tea, biscuits) 
+p <- ggplot(data, aes(x = tea, y = biscuits)) +
+    geom_point() + 
+    geom_smooth(method = "lm") + 
+    labs(x = "Tea", y = "Biscuits") + theme_bw() 
+print(p)
+```
+
+Attending to the correlations between the variables as depicted in Figure \@ref(fig:biscuits) 
+
+```{r modelo01, echo=FALSE}
+data(efc)
+efc <- to_factor(efc, c161sex, e42dep, c172code)
+m   <- lm(neg_c_7 ~ pos_v_4 + c12hour + e42dep + c172code, data = efc)
+m2   <- lm(neg_c_7 ~ pos_v_4 + c12hour + e42dep , data = efc)
+broom::tidy(m) %>%
+  kable(format = table_format,
+        caption = "Tabla de regresión",
+        digits = 2,
+        booktabs=TRUE,
+        col.names = c("Variable","Coef.","SE","t","p")) %>%
+  kable_styling()
+```
+
+
+Table \@ref(tab:modelo01) shows the results of the regression model. @Brady2014 lo enuncia.
+
+```{r results='asis'}
+cap <- "Modelos de regresión para autos y sus partes."
+custom.coef.names = c(
+  "Intercept",
+  "Positive value with 4 items",
+  "average number of hours of care per week",
+  "slightly dependent", "moderately dependent", "severely dependent",
+  "intermediate level of education","high level of education"
+  )
+custom.note = " $^{***}$p < 0,001;$^{**}$p < 0,01;$^{*}$p < 0,05. Errores estándar robustos entre paréntesis (HC2)"
+knitreg(list(m,m2),
+       caption = paste("(\\#tab:model2)",cap),
+       center = TRUE,
+       custom.coef.names=custom.coef.names,
+       caption.above = T,
+       custom.note = custom.note,
+       float.pos = "H",)
+```
+
+Table \@ref(tab:model2) contrasta dos modelos de regresión
+
+# Conclusiones
+
+
+# References
+
+
+<div id="refs"> </div>  <!-- Although <div> is an HTML tag, this method also works for other output formats such as PDF. -->
+
+
+# (APPENDIX) Appendix {-}
+
+
+`r if (knitr::is_latex_output()){ '\\appendix'}`
+
+
+`r if (knitr::is_latex_output()){ '\\section{Appendix}'}`
+
+
+
+|                     | Sample  |   CEP  |
+|---------------------|:-------:|:------:|
+| __Gender__          |         |        |
+| Men                 | 49,82%  | 50,52% |
+| Women               | 50.18%  | 49,47% |
+| __Age__             |         |        |
+| 18 - 24             | 18,55%  | 18,17% |
+| 25 - 34             | 18,86%  | 17,48% |
+| 35 - 44             | 19.09%  | 19,98% |
+| 45 - 54             | 17,96%  | 19,23% |
+| 55 - or more        | 25,54%  | 25.11% |
+| __Education__       |         |        |
+| Primary  or less    | 2,93%   | 15,88% |
+| High school          | 43,23%  | 37,04% |
+| Non university      | 32,63%  | 28,93% |
+| university or more  | 21,21%  | 18,13% |
+Table: `r as.character(paste("(\\#tab:rep-samp)", "Representativeness of the sample"))`.

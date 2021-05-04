@@ -1,0 +1,39 @@
+---
+title: "Preparación de datos"
+date: "`r format(Sys.time(), '%A %d %B %Y %X')`"
+output: 
+  html_document: 
+    toc: yes
+    code_folding: hide
+    toc_float: 
+      collapsed: true
+      smooth_scroll: false
+      number_sections: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Setup
+
+```{r setup}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+options(scipen=9999) # desactivar notacion cientifica
+```
+
+## Librerías
+
+```{r}
+if (!require("pacman")) install.packages("pacman") # instalar pacman
+pacman::p_load(tidyverse, haven)                   # cargar librerias
+```
+
+## Datos
+
+# Análisis
+
+## Descriptivos univariados
+
+## Descriptivos bivariadas
+
+## Estimaciones - modelos
+
