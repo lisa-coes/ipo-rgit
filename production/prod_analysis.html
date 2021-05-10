@@ -11,7 +11,7 @@
 
 
 
-<title>Preparación de datos</title>
+<title>Análisis de datos</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1578,18 +1578,15 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Preparación de datos</h1>
-<h4 class="date">lunes 10 mayo 2021 15:47:29</h4>
+<h1 class="title toc-ignore">Análisis de datos</h1>
+<h4 class="date">lunes 10 mayo 2021 15:58:49</h4>
 
 </div>
 
 
-<div id="setup" class="section level1" number="1">
-<h1 number="1"><span class="header-section-number">1</span> Setup</h1>
-<pre class="r"><code>knitr::opts_chunk$set(warning = FALSE, 
-                      message = FALSE, 
-                      echo = TRUE 
-                      )
+<div id="setup" class="section level1">
+<h1>Setup</h1>
+<pre class="r"><code>knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 options(scipen=9999) # desactivar notacion cientifica</code></pre>
 <style type="text/css">
 # /* expandir el espacio del documento*/
@@ -1597,6 +1594,7 @@ body .main-container {
       max-width: 1600px !important;
       width: 1600px !important;
     }
+
 #/* expandir width de la TOC*/
 div.tocify {
     width: 22% !important;
@@ -1604,661 +1602,36 @@ div.tocify {
     max-height: 102% !important;
 }
 </style>
-<div id="librerías" class="section level2" number="1.1">
-<h2 number="1.1"><span class="header-section-number">1.1</span> Librerías</h2>
+<div id="librerías" class="section level2">
+<h2>Librerías</h2>
 <pre class="r"><code>if (!require(&quot;pacman&quot;)) install.packages(&quot;pacman&quot;) # instalar pacman
-                            # cargar librerias
 pacman::p_load(dplyr,       # Manipulacion de datos 
                haven,       # importar datos en .dta o .sav
-               car,         # recodificar variables
-               sjlabelled,  # etiquetado de variables
                sjmisc,      # descriptivos y frecuencias
                sjPlot,      # tablas, plots y descriptivos
                summarytools,# resumen de dataframe
+               texreg,      # tablas de regresion
+               knitr,       # tablas kable
+               kableExtra,  # tablas kable personalizadas
+               ggplot2      # plots
                )</code></pre>
 </div>
-<div id="datos" class="section level2" number="1.2">
-<h2 number="1.2"><span class="header-section-number">1.2</span> Datos</h2>
-<p>Para este ejemplo se va utilizar una base de datos proveniente del paquete <code>carData</code>:</p>
-<blockquote>
-<p>The Chile data frame has 2700 rows and 8 columns. The data are from a national survey conducted in April and May of 1988 by FLACSO/Chile. There are some missing data.</p>
-</blockquote>
-<pre class="r"><code>df&lt;- carData::Chile
-df1 &lt;- df %&gt;% select(zona=region,
-                     poblacion=population,
-                     sexo=sex,
-                     edad=age,
-                     educ=education,
-                     statusquo)</code></pre>
+<div id="datos" class="section level2">
+<h2>Datos</h2>
+<pre class="r"><code>load(file = &quot;../input/data/proc/df_final.Rdata&quot; )</code></pre>
 </div>
 </div>
-<div id="preparación" class="section level1" number="2">
-<h1 number="2"><span class="header-section-number">2</span> Preparación</h1>
-<p>En esta sección se realizará la preparación de datos. Se sugiere seguir los siguientes pasos para cada variable:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Paso</th>
-<th>Función</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1. Descriptivo inicial</td>
-<td>sjmisc::frq() o sjmisc::descr()</td>
-</tr>
-<tr class="even">
-<td>2. Recodificación</td>
-<td>car::recode()</td>
-</tr>
-<tr class="odd">
-<td>3. Etiquetado de valores</td>
-<td>sjlabelled::set_labels()</td>
-</tr>
-<tr class="even">
-<td>4. Etiquetado de variable</td>
-<td>sjlabelled::set_label()</td>
-</tr>
-<tr class="odd">
-<td>5. Descriptivo final</td>
-<td>sjmisc::frq o sjmisc::descr()</td>
-</tr>
-</tbody>
-</table>
-<div id="variables-individuales" class="section level2" number="2.1">
-<h2 number="2.1"><span class="header-section-number">2.1</span> Variables individuales</h2>
-<div id="edad" class="section level3" number="2.1.1">
-<h3 number="2.1.1"><span class="header-section-number">2.1.1</span> Edad</h3>
-<pre class="r"><code>sjmisc::descr(df1$edad)</code></pre>
-<pre><code>## 
-## ## Basic descriptive statistics
-## 
-##  var    type label    n NA.prc  mean    sd   se md trimmed      range iqr skew
-##   dd integer    dd 2699   0.04 38.55 14.76 0.28 36   37.54 52 (18-70)  23 0.47</code></pre>
-<pre class="r"><code>df1$edadcat &lt;- car::recode(var = df1$edad,
-                           recodes = &quot;18:24=1;25:44=2;45:64=3;65:70=4&quot;,
-                           as.factor = T) 
-df1$edadcat &lt;- set_labels(x = df1$edadcat,
-                          labels = c(&quot;18 a 24 años&quot; = 1,
-                                     &quot;25 a 44 años&quot; = 2,
-                                     &quot;45 a 65 años&quot; = 3,
-                                     &quot;65 años o más&quot; = 4))
-df1$edadcat &lt;- set_label(df1$edadcat,label = &quot;Tramos de edad&quot;)
-sjmisc::frq(df1$edadcat,out = &quot;txt&quot;)</code></pre>
-<pre><code>## 
-## Tramos de edad (x) &lt;categorical&gt;
-## # total N=2700  valid N=2699  mean=2.18  sd=0.85
-## 
-## Value |         Label |    N | Raw % | Valid % | Cum. %
-## -------------------------------------------------------
-##     1 |  18 a 24 años |  588 | 21.78 |   21.79 |  21.79
-##     2 |  25 a 44 años | 1231 | 45.59 |   45.61 |  67.40
-##     3 |  45 a 65 años |  697 | 25.81 |   25.82 |  93.22
-##     4 | 65 años o más |  183 |  6.78 |    6.78 | 100.00
-##  &lt;NA&gt; |          &lt;NA&gt; |    1 |  0.04 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+<div id="análisis" class="section level1">
+<h1>Análisis</h1>
+<div id="descriptivos-univariados" class="section level2">
+<h2>Descriptivos univariados</h2>
 </div>
-<div id="sexo" class="section level3" number="2.1.2">
-<h3 number="2.1.2"><span class="header-section-number">2.1.2</span> Sexo</h3>
-<pre class="r"><code>sjmisc::frq(df1$sexo)</code></pre>
-<pre><code>## 
-## x &lt;categorical&gt;
-## # total N=2700  valid N=2700  mean=1.49  sd=0.50
-## 
-## Value |    N | Raw % | Valid % | Cum. %
-## ---------------------------------------
-## F     | 1379 | 51.07 |   51.07 |  51.07
-## M     | 1321 | 48.93 |   48.93 | 100.00
-## &lt;NA&gt;  |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
-<pre class="r"><code>df1$mujer &lt;- car::recode(var = df1$sexo,
-                           recodes = &quot;&#39;F&#39;=1;&#39;M&#39;=0&quot;,
-                           as.factor = T) 
-
-df1$mujer &lt;- set_labels(x = df1$mujer,
-                          labels = c(&quot;Hombre&quot; = 0,
-                                     &quot;Mujer&quot; = 1))
-df1$mujer &lt;- set_label(df1$mujer,label = &quot;Sexo entrevistado&quot;)
-sjmisc::frq(df1$mujer,out = &quot;txt&quot;)</code></pre>
-<pre><code>## 
-## Sexo entrevistado (x) &lt;categorical&gt;
-## # total N=2700  valid N=2700  mean=0.51  sd=0.50
-## 
-## Value |  Label |    N | Raw % | Valid % | Cum. %
-## ------------------------------------------------
-##     0 | Hombre | 1321 | 48.93 |   48.93 |  48.93
-##     1 |  Mujer | 1379 | 51.07 |   51.07 | 100.00
-##  &lt;NA&gt; |   &lt;NA&gt; |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+<div id="descriptivos-bivariadas" class="section level2">
+<h2>Descriptivos bivariadas</h2>
 </div>
-<div id="nivel-educacional" class="section level3" number="2.1.3">
-<h3 number="2.1.3"><span class="header-section-number">2.1.3</span> Nivel educacional</h3>
-<pre class="r"><code>sjmisc::frq(df1$educ)</code></pre>
-<pre><code>## 
-## x &lt;categorical&gt;
-## # total N=2700  valid N=2689  mean=2.00  sd=0.91
-## 
-## Value |    N | Raw % | Valid % | Cum. %
-## ---------------------------------------
-## P     | 1107 | 41.00 |   41.17 |  41.17
-## PS    |  462 | 17.11 |   17.18 |  58.35
-## S     | 1120 | 41.48 |   41.65 | 100.00
-## &lt;NA&gt;  |   11 |  0.41 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
-<pre class="r"><code>df1$educ &lt;- car::recode(df1$educ,
-                        recodes = &quot;&#39;P&#39;=1;&#39;S&#39;=2;&#39;PS&#39;=3&quot;,
-                        as.factor = T)
-
-df1$educ &lt;- set_labels(df1$educ,labels = c(&quot;Primaria&quot;=1,
-                                           &quot;Secundaria&quot;=2,
-                                           &quot;Post-secundaria&quot;=3))
-df1$educ &lt;- set_label(df1$educ,label = &quot;Nivel educacional&quot;)
-sjmisc::frq(df1$educ)</code></pre>
-<pre><code>## 
-## Nivel educacional (x) &lt;categorical&gt;
-## # total N=2700  valid N=2689  mean=1.76  sd=0.73
-## 
-## Value |           Label |    N | Raw % | Valid % | Cum. %
-## ---------------------------------------------------------
-##     1 |        Primaria | 1107 | 41.00 |   41.17 |  41.17
-##     2 |      Secundaria | 1120 | 41.48 |   41.65 |  82.82
-##     3 | Post-secundaria |  462 | 17.11 |   17.18 | 100.00
-##  &lt;NA&gt; |            &lt;NA&gt; |   11 |  0.41 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
+<div id="estimaciones---modelos" class="section level2">
+<h2>Estimaciones - modelos</h2>
 </div>
-<div id="apoyo-statusquo" class="section level3" number="2.1.4">
-<h3 number="2.1.4"><span class="header-section-number">2.1.4</span> Apoyo statusquo</h3>
-<pre class="r"><code>sjmisc::descr(df1$statusquo)</code></pre>
-<pre><code>## 
-## ## Basic descriptive statistics
-## 
-##  var    type label    n NA.prc mean sd   se    md trimmed            range
-##   dd numeric    dd 2683   0.63    0  1 0.02 -0.05   -0.03 3.85 (-1.8-2.05)
-##      iqr skew
-##  1.97081 0.16</code></pre>
-<pre class="r"><code>df1$statusquo &lt;- set_label(df1$statusquo,label = &quot;Escala de apoyo al status-quo&quot;)
-sjmisc::descr(df1$statusquo)</code></pre>
-<pre><code>## 
-## ## Basic descriptive statistics
-## 
-##  var    type                         label    n NA.prc mean sd   se    md
-##   dd numeric Escala de apoyo al status-quo 2683   0.63    0  1 0.02 -0.05
-##  trimmed            range     iqr skew
-##    -0.03 3.85 (-1.8-2.05) 1.97081 0.16</code></pre>
-</div>
-</div>
-<div id="variables-contextuales" class="section level2" number="2.2">
-<h2 number="2.2"><span class="header-section-number">2.2</span> Variables contextuales</h2>
-<div id="zona" class="section level3" number="2.2.1">
-<h3 number="2.2.1"><span class="header-section-number">2.2.1</span> Zona</h3>
-<pre class="r"><code>sjmisc::frq(df1$zona)</code></pre>
-<pre><code>## 
-## x &lt;categorical&gt;
-## # total N=2700  valid N=2700  mean=3.50  sd=1.54
-## 
-## Value |   N | Raw % | Valid % | Cum. %
-## --------------------------------------
-## C     | 600 | 22.22 |   22.22 |  22.22
-## M     | 100 |  3.70 |    3.70 |  25.93
-## N     | 322 | 11.93 |   11.93 |  37.85
-## S     | 718 | 26.59 |   26.59 |  64.44
-## SA    | 960 | 35.56 |   35.56 | 100.00
-## &lt;NA&gt;  |   0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
-<pre class="r"><code>df1$zona &lt;- set_labels(x = df1$zona,
-                          labels = c(&quot;Centro&quot; = &quot;C&quot;,
-                                     &quot;Metropolitana Santiago&quot; = &quot;M&quot;,
-                                     &quot;Norte&quot;=&quot;N&quot;,
-                                     &quot;Sur&quot;=&quot;S&quot;,
-                                     &quot;Santiago ciudad&quot;=&#39;SA&#39;))
-df1$zona &lt;- set_label(df1$zona,label = &quot;Zona geográfica&quot;)
-sjmisc::frq(df1$zona,out = &quot;txt&quot;)</code></pre>
-<pre><code>## 
-## Zona geográfica (x) &lt;categorical&gt;
-## # total N=2700  valid N=2700  mean=3.50  sd=1.54
-## 
-## Value |                  Label |   N | Raw % | Valid % | Cum. %
-## ---------------------------------------------------------------
-##     1 |                 Centro | 600 | 22.22 |   22.22 |  22.22
-##     2 | Metropolitana Santiago | 100 |  3.70 |    3.70 |  25.93
-##     3 |                  Norte | 322 | 11.93 |   11.93 |  37.85
-##     4 |                    Sur | 718 | 26.59 |   26.59 |  64.44
-##     5 |        Santiago ciudad | 960 | 35.56 |   35.56 | 100.00
-##  &lt;NA&gt; |                   &lt;NA&gt; |   0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
-</div>
-<div id="proporcion-de-mujeres-x-zona" class="section level3" number="2.2.2">
-<h3 number="2.2.2"><span class="header-section-number">2.2.2</span> Proporcion de mujeres x zona</h3>
-<pre class="r"><code>tab_xtab(var.row = df1$zona, # Filas= zona
-         var.col = df1$mujer,# columna= sexo 
-         show.obs = FALSE,   
-         show.row.prc = T)</code></pre>
-<table style="border-collapse:collapse; border:none;">
-<tr>
-<th style="border-top:double; text-align:center; font-style:italic; font-weight:normal; border-bottom:1px solid;" rowspan="2">
-Zona geográfica
-</th>
-<th style="border-top:double; text-align:center; font-style:italic; font-weight:normal;" colspan="2">
-Sexo entrevistado
-</th>
-<th style="border-top:double; text-align:center; font-style:italic; font-weight:normal; font-weight:bolder; font-style:italic; border-bottom:1px solid; " rowspan="2">
-Total
-</th>
-</tr>
-<tr>
-<td style="border-bottom:1px solid; text-align:center; padding:0.2cm;">
-Hombre
-</td>
-<td style="border-bottom:1px solid; text-align:center; padding:0.2cm;">
-Mujer
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm;  text-align:left; vertical-align:middle;">
-Centro
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">50 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">50 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;  ">
-<span style="color:#333399;">100 %</span>
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm;  text-align:left; vertical-align:middle;">
-Metropolitana<br>Santiago
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">49 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">51 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;  ">
-<span style="color:#333399;">100 %</span>
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm;  text-align:left; vertical-align:middle;">
-Norte
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">47.8 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">52.2 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;  ">
-<span style="color:#333399;">100 %</span>
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm;  text-align:left; vertical-align:middle;">
-Sur
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">49.6 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">50.4 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;  ">
-<span style="color:#333399;">100 %</span>
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm;  text-align:left; vertical-align:middle;">
-Santiago ciudad
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">48.1 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center; ">
-<span style="color:#333399;">51.9 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;  ">
-<span style="color:#333399;">100 %</span>
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm;  border-bottom:double; font-weight:bolder; font-style:italic; text-align:left; vertical-align:middle;">
-Total
-</td>
-<td style="padding:0.2cm; text-align:center;   border-bottom:double;">
-<span style="color:#333399;">48.9 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;   border-bottom:double;">
-<span style="color:#333399;">51.1 %</span>
-</td>
-<td style="padding:0.2cm; text-align:center;   border-bottom:double;">
-<span style="color:#333399;">100 %</span>
-</td>
-</tr>
-<td style="text-align:right; font-size:0.9em; font-style:italic; padding:0.2cm;" colspan="4">
-χ<sup>2</sup>=0.803 · df=4 · Cramer’s V=0.017 · p=0.938
-</td>
-</tr>
-</table>
-<pre class="r"><code>df1 %&gt;% group_by(zona) %&gt;% summarise(propmuj=mean(as.numeric(mujer))-1) </code></pre>
-<pre><code>## # A tibble: 5 x 2
-##   zona  propmuj
-##   &lt;fct&gt;   &lt;dbl&gt;
-## 1 C       0.5  
-## 2 M       0.51 
-## 3 N       0.522
-## 4 S       0.504
-## 5 SA      0.519</code></pre>
-<pre class="r"><code>prop.muj&lt;- df1 %&gt;%
-  group_by(zona, mujer) %&gt;%
-  summarise(n = n()) %&gt;%
-  mutate(propmuj = n / sum(n)) %&gt;%
-  filter(mujer==1) %&gt;% 
-  ungroup() %&gt;% 
-  select(zona,propmuj)
-
-df1 &lt;- left_join(df1,prop.muj,by=&quot;zona&quot;)
-df1$propmuj &lt;- set_label(df1$propmuj,label = &quot;Proporción de mujeres por zona geográfica&quot;)
-sjmisc::descr(df1$propmuj)</code></pre>
-<pre><code>## 
-## ## Basic descriptive statistics
-## 
-##  var    type                                     label    n NA.prc mean   sd se
-##   dd numeric Proporción de mujeres por zona geográfica 2700      0 0.51 0.01  0
-##    md trimmed           range        iqr  skew
-##  0.51    0.51 0.02 (0.5-0.52) 0.01457173 -0.01</code></pre>
-</div>
-<div id="población-por-zona" class="section level3" number="2.2.3">
-<h3 number="2.2.3"><span class="header-section-number">2.2.3</span> Población por zona</h3>
-<pre class="r"><code>sjmisc::frq(df1$poblacion)</code></pre>
-<pre><code>## 
-## x &lt;integer&gt;
-## # total N=2700  valid N=2700  mean=152222.22  sd=102198.04
-## 
-##  Value |    N | Raw % | Valid % | Cum. %
-## ----------------------------------------
-##   3750 |   20 |  0.74 |    0.74 |   0.74
-##   8750 |   60 |  2.22 |    2.22 |   2.96
-##  15000 |  300 | 11.11 |   11.11 |  14.07
-##  25000 |  360 | 13.33 |   13.33 |  27.41
-##  45000 |  120 |  4.44 |    4.44 |  31.85
-##  62500 |   80 |  2.96 |    2.96 |  34.81
-##  87500 |   80 |  2.96 |    2.96 |  37.78
-## 125000 |  240 |  8.89 |    8.89 |  46.67
-## 175000 |  140 |  5.19 |    5.19 |  51.85
-## 250000 | 1300 | 48.15 |   48.15 | 100.00
-##   &lt;NA&gt; |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
-<pre class="r"><code>df1$poblacion &lt;- set_label(df1$poblacion,label = &quot;Población por zona geofráfica&quot;)
-sjmisc::frq(df1$poblacion,out = &quot;txt&quot;)</code></pre>
-<pre><code>## 
-## Población por zona geofráfica (x) &lt;integer&gt;
-## # total N=2700  valid N=2700  mean=152222.22  sd=102198.04
-## 
-##  Value |    N | Raw % | Valid % | Cum. %
-## ----------------------------------------
-##   3750 |   20 |  0.74 |    0.74 |   0.74
-##   8750 |   60 |  2.22 |    2.22 |   2.96
-##  15000 |  300 | 11.11 |   11.11 |  14.07
-##  25000 |  360 | 13.33 |   13.33 |  27.41
-##  45000 |  120 |  4.44 |    4.44 |  31.85
-##  62500 |   80 |  2.96 |    2.96 |  34.81
-##  87500 |   80 |  2.96 |    2.96 |  37.78
-## 125000 |  240 |  8.89 |    8.89 |  46.67
-## 175000 |  140 |  5.19 |    5.19 |  51.85
-## 250000 | 1300 | 48.15 |   48.15 | 100.00
-##   &lt;NA&gt; |    0 |  0.00 |    &lt;NA&gt; |   &lt;NA&gt;</code></pre>
-</div>
-</div>
-</div>
-<div id="seleccionar-variables" class="section level1" number="3">
-<h1 number="3"><span class="header-section-number">3</span> Seleccionar variables</h1>
-<pre class="r"><code>df_final&lt;- df1 %&gt;%
-  select(zona,
-         poblacion,
-         mujer,
-         edadcat,
-         educ,
-         statusquo)</code></pre>
-</div>
-<div id="resumen" class="section level1" number="4">
-<h1 number="4"><span class="header-section-number">4</span> Resumen</h1>
-<style type="text/css">
- img {   background-color: transparent;   border: 0; }  .st-table td, .st-table th {   padding: 8px; }  .st-table > thead > tr {    background-color: #eeeeee; }  .st-cross-table td {   text-align: center; }  .st-descr-table td {   text-align: right; }  table.st-table th {   text-align: center; }  table.st-table > thead > tr {    background-color: #eeeeee; }  table.st-table td span {   display: block; }  table.st-table > tfoot > tr > td {   border:none; }  .st-container {   width: 100%;   padding-right: 15px;   padding-left: 15px;   margin-right: auto;   margin-left: auto;   margin-top: 15px; }  .st-multiline {   white-space: pre; }  .st-table {     width: auto;     table-layout: auto;     margin-top: 20px;     margin-bottom: 20px;     max-width: 100%;     background-color: transparent;     border-collapse: collapse; }  .st-table > thead > tr > th, .st-table > tbody > tr > th, .st-table > tfoot > tr > th, .st-table > thead > tr > td, .st-table > tbody > tr > td, .st-table > tfoot > tr > td {   vertical-align: middle; }  .st-table-bordered {   border: 1px solid #bbbbbb; }  .st-table-bordered > thead > tr > th, .st-table-bordered > tbody > tr > th, .st-table-bordered > thead > tr > td, .st-table-bordered > tbody > tr > td {   border: 1px solid #cccccc; }  .st-table-bordered > thead > tr > th, .st-table-bordered > thead > tr > td, .st-table thead > tr > th {   border-bottom: none; }  .st-freq-table > thead > tr > th, .st-freq-table > tbody > tr > th, .st-freq-table > tfoot > tr > th, .st-freq-table > thead > tr > td, .st-freq-table > tbody > tr > td, .st-freq-table > tfoot > tr > td, .st-freq-table-nomiss > thead > tr > th, .st-freq-table-nomiss > tbody > tr > th, .st-freq-table-nomiss > tfoot > tr > th, .st-freq-table-nomiss > thead > tr > td, .st-freq-table-nomiss > tbody > tr > td, .st-freq-table-nomiss > tfoot > tr > td, .st-cross-table > thead > tr > th, .st-cross-table > tbody > tr > th, .st-cross-table > tfoot > tr > th, .st-cross-table > thead > tr > td, .st-cross-table > tbody > tr > td, .st-cross-table > tfoot > tr > td {   padding-left: 20px;   padding-right: 20px; }  .st-table-bordered > thead > tr > th, .st-table-bordered > tbody > tr > th, .st-table-bordered > thead > tr > td, .st-table-bordered > tbody > tr > td {   border: 1px solid #cccccc; }  .st-table-striped > tbody > tr:nth-of-type(odd) {   background-color: #ffffff; }  .st-table-striped > tbody > tr:nth-of-type(even) {   background-color: #f9f9f9; }  .st-descr-table > thead > tr > th, .st-descr-table > tbody > tr > th, .st-descr-table > thead > tr > td, .st-descr-table > tbody > tr > td {   padding-left: 24px;   padding-right: 24px;   word-wrap: break-word; }  .st-freq-table, .st-freq-table-nomiss, .st-cross-table {   border: medium none; }  .st-freq-table > thead > tr:nth-child(1) > th:nth-child(1), .st-cross-table > thead > tr:nth-child(1) > th:nth-child(1), .st-cross-table > thead > tr:nth-child(1) > th:nth-child(3) {   border: none;   background-color: #ffffff;   text-align: center; }  .st-protect-top-border {   border-top: 1px solid #cccccc !important; }  .st-ws-char {   display: inline;   color: #999999;   letter-spacing: 0.2em; }  /* Optionnal classes */ .st-small {   font-size: 13px; }  .st-small td, .st-small th {   padding: 8px; }  .st-small > thead > tr > th, .st-small > tbody > tr > th, .st-small > thead > tr > td, .st-small > tbody > tr > td {   padding-left: 12px;   padding-right: 12px; } </style>
-<div class="container st-container">
-<h3>Data Frame Summary</h3>
-<h4>df_final</h4>
-<strong>Dimensions</strong>: 2700 x 6
-  <br /><strong>Duplicates</strong>: 119
-<br />
-<table class="table table-striped table-bordered st-table st-table-striped st-table-bordered st-multiline ">
-  <thead>
-    <tr>
-      <th align="center" class="st-protect-top-border"><strong>No</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Variable</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Label</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Stats / Values</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Freqs (% of Valid)</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Graph</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Valid</strong></th>
-      <th align="center" class="st-protect-top-border"><strong>Missing</strong></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center">1</td>
-      <td align="left">zona
-[factor]</td>
-      <td align="left">Zona geográfica</td>
-      <td align="left">1. C
-2. M
-3. N
-4. S
-5. SA</td>
-      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">600</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">22.2%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">100</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">3.7%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">322</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">11.9%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">718</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">26.6%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">960</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">35.6%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
-      <td align="left" style="vertical-align:middle;padding:0;background-color:transparent"><img style="border:none;background-color:transparent;padding:0" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAEIAAAB9BAMAAADkVqijAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX////9/v2mpqbw8PD///+xh0SBAAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5QUKCy8hfyCIVwAAAHBJREFUWMPt07ENACEIhWFXYATPDXT/3a6QXNCINB5YvL/+EiWBlO7pmaMvFqWNVQgId2HvKekdFMPLS1Hk7yEgQoS9p6R39l56WZ+Fg4AIE/aekt4f9yLK61lEEBC+wt7TuHvhNrP0KgSEk7D39IZeRl6YLpiXPjAAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjEtMDUtMTBUMTU6NDc6MzMtMDQ6MDCW4RdhAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIxLTA1LTEwVDE1OjQ3OjMzLTA0OjAw57yv3QAAAABJRU5ErkJggg=="></td>
-      <td align="center">2700
-(100.0%)</td>
-      <td align="center">0
-(0.0%)</td>
-    </tr>
-    <tr>
-      <td align="center">2</td>
-      <td align="left">poblacion
-[integer]</td>
-      <td align="left">Población por zona geofráfica</td>
-      <td align="left">Mean (sd) : 152222.2 (102198)
-min &lt; med &lt; max:
-3750 &lt; 175000 &lt; 250000
-IQR (CV) : 225000 (0.7)</td>
-      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">3750</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">20</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">0.7%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">8750</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">60</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">2.2%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">15000</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">300</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">11.1%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">25000</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">360</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">13.3%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">45000</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">120</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">4.4%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">62500</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">80</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">3.0%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">87500</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">80</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">3.0%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">125000</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">240</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">8.9%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">175000</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">140</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">5.2%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 2px 0 7px;margin:0;border:0" align="right">250000</td><td style="padding:0 2px;border:0;" align="left">:</td><td style="padding:0 4px 0 6px;margin:0;border:0" align="right">1300</td><td style="padding:0;border:0" align="left">(</td><td style="padding:0 2px;margin:0;border:0" align="right">48.1%</td><td style="padding:0 4px 0 0;border:0" align="left">)</td></tr></table></td>
-      <td align="left" style="vertical-align:middle;padding:0;background-color:transparent"><img style="border:none;background-color:transparent;padding:0" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAFUAAADzBAMAAAAFnkeaAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX////9/v2mpqbw8PD///+xh0SBAAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5QUKCy8hfyCIVwAAALpJREFUaN7t2MsJwzAQhGGXkO3Aljuw++8t5AWxINpZJywS+ef8HeSB2YOnabwU83PBYrE/sQLtyhbh41523bBYbG0jG/JlX7Y8syid7Y9gsdhzGzIhWZtvvbjuodUEFov9bCN7MyEJ92FR7do+kVgs1rGRvXkuwwrPfesBi8V+YyN7c2GC5T5gsXl2vPtwj9jDLRsWi7VzGzIhPVnvX2rdGRaLPdrIhkxIT7YImQ83tR0s9t9sZEMj5Qo7ff1pnmEyggAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0wNS0xMFQxNTo0NzozMy0wNDowMJbhF2EAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMDUtMTBUMTU6NDc6MzMtMDQ6MDDnvK/dAAAAAElFTkSuQmCC"></td>
-      <td align="center">2700
-(100.0%)</td>
-      <td align="center">0
-(0.0%)</td>
-    </tr>
-    <tr>
-      <td align="center">3</td>
-      <td align="left">mujer
-[factor]</td>
-      <td align="left">Sexo entrevistado</td>
-      <td align="left">1. 0
-2. 1</td>
-      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1321</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">48.9%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1379</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">51.1%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
-      <td align="left" style="vertical-align:middle;padding:0;background-color:transparent"><img style="border:none;background-color:transparent;padding:0" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAFkAAAA3BAMAAACV2/u2AAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX////9/v2mpqbw8PD///+xh0SBAAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5QUKCy8hfyCIVwAAAEBJREFUSMdjYBi6QIkYICgAVa1sTBgYjaoeVT2qmq6qScvFgkQBeqgmyt1KCiSEibHxqOpR1aOq6amatFw8FAEAfiJJlFY0LQ8AAAAldEVYdGRhdGU6Y3JlYXRlADIwMjEtMDUtMTBUMTU6NDc6MzMtMDQ6MDCW4RdhAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIxLTA1LTEwVDE1OjQ3OjMzLTA0OjAw57yv3QAAAABJRU5ErkJggg=="></td>
-      <td align="center">2700
-(100.0%)</td>
-      <td align="center">0
-(0.0%)</td>
-    </tr>
-    <tr>
-      <td align="center">4</td>
-      <td align="left">edadcat
-[factor]</td>
-      <td align="left">Tramos de edad</td>
-      <td align="left">1. 1
-2. 2
-3. 3
-4. 4</td>
-      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">588</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">21.8%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1231</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">45.6%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">697</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">25.8%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">183</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">6.8%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
-      <td align="left" style="vertical-align:middle;padding:0;background-color:transparent"><img style="border:none;background-color:transparent;padding:0" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAFEAAABmBAMAAABB3mAQAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX////9/v2mpqbw8PD///+xh0SBAAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5QUKCy8hfyCIVwAAAGVJREFUWMPt1MENgCAMRmFGsBtYGMH9d/OCB7GmJYQY4nvn71KSn5TWKTeptG1VluMeEom8ZHxH4jZTZrf95fZnSORfZXxH3+596GdQWxqvhEQiO3ckbtP3rhFZjGuRSGTfjlboBDWLnzw328XKAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTA1LTEwVDE1OjQ3OjMzLTA0OjAwluEXYQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wNS0xMFQxNTo0NzozMy0wNDowMOe8r90AAAAASUVORK5CYII="></td>
-      <td align="center">2699
-(100.0%)</td>
-      <td align="center">1
-(0.0%)</td>
-    </tr>
-    <tr>
-      <td align="center">5</td>
-      <td align="left">educ
-[factor]</td>
-      <td align="left">Nivel educacional</td>
-      <td align="left">1. 1
-2. 2
-3. 3</td>
-      <td align="left" style="padding:0;vertical-align:middle"><table style="border-collapse:collapse;border:none;margin:0"><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1107</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">41.2%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">1120</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">41.7%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr><tr style="background-color:transparent"><td style="padding:0 5px 0 7px;margin:0;border:0" align="right">462</td><td style="padding:0 2px 0 0;border:0;" align="left">(</td><td style="padding:0;border:0" align="right">17.2%</td><td style="padding:0 4px 0 2px;border:0" align="left">)</td></tr></table></td>
-      <td align="left" style="vertical-align:middle;padding:0;background-color:transparent"><img style="border:none;background-color:transparent;padding:0" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAEsAAABOBAMAAACarfZqAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX////9/v2mpqbw8PD///+xh0SBAAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5QUKCy8hfyCIVwAAAExJREFUSMdjYBjcQAk/EIAqUzbGB4xGlY0qG/rKiMwLgvjBgCoj4AUFogLEeFTZqLJBrIzIRD5k8iluZcgBYjSqbFTZcFRGZF4YrAAAbBxVPkj1LvsAAAAldEVYdGRhdGU6Y3JlYXRlADIwMjEtMDUtMTBUMTU6NDc6MzMtMDQ6MDCW4RdhAAAAJXRFWHRkYXRlOm1vZGlmeQAyMDIxLTA1LTEwVDE1OjQ3OjMzLTA0OjAw57yv3QAAAABJRU5ErkJggg=="></td>
-      <td align="center">2689
-(99.6%)</td>
-      <td align="center">11
-(0.4%)</td>
-    </tr>
-    <tr>
-      <td align="center">6</td>
-      <td align="left">statusquo
-[numeric]</td>
-      <td align="left">Escala de apoyo al status-quo</td>
-      <td align="left">Mean (sd) : 0 (1)
-min &lt; med &lt; max:
--1.8 &lt; 0 &lt; 2
-IQR (CV) : 2 (-89450012)</td>
-      <td align="left" style="vertical-align:middle">2092 distinct values</td>
-      <td align="left" style="vertical-align:middle;padding:0;background-color:transparent"><img style="border:none;background-color:transparent;padding:0" src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAJgAAABuBAMAAAApJ8cWAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAD1BMVEX////9/v2mpqbw8PD///+xh0SBAAAAAnRSTlMAAHaTzTgAAAABYktHRACIBR1IAAAAB3RJTUUH5QUKCy8hfyCIVwAAAIZJREFUaN7t2EEKgCAQQFGvYDdIb5D3v1tQM4sGjBgnCPt/E4S81YhoSuQpS0XKrgxW29EGBgYGBgYG9klskXN/DcHOVQ0MDOwB1tl8PqyzGgzsTczcHMcws8vApsB0REKwdj/TYP/BdK5CsHr9goGBgc2K2Qf/IUx/g4GBgYGBCVZCSuRpB8eaae6gKSwvAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDIxLTA1LTEwVDE1OjQ3OjMzLTA0OjAwluEXYQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyMS0wNS0xMFQxNTo0NzozMy0wNDowMOe8r90AAAAASUVORK5CYII="></td>
-      <td align="center">2683
-(99.4%)</td>
-      <td align="center">17
-(0.6%)</td>
-    </tr>
-  </tbody>
-</table>
-<p>Generated by <a href="https://github.com/dcomtois/summarytools">summarytools</a> 0.9.9 (<a href="https://www.r-project.org/">R</a> version 4.0.2)<br />2021-05-10</p>
-</div>
-<table style="border-collapse:collapse; border:none;">
-<caption>
-Data frame: df_final
-</caption>
-<tr>
-<th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;">
-ID
-</th>
-<th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;">
-Name
-</th>
-<th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;">
-Label
-</th>
-<th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;">
-Values
-</th>
-<th style="border-bottom:double; font-style:italic; font-weight:normal; padding:0.2cm; text-align:left; vertical-align:top;">
-Value Labels
-</th>
-</tr>
-<tr>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-1
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-zona
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-Zona geográfica
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-C<br>M<br>N<br>S<br>SA
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-Centro<br>Metropolitana Santiago<br>Norte<br>Sur<br>Santiago ciudad
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-2
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-poblacion
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-Población por zona geofráfica
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2">
-<em>range: 3750-250000</em>
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-3
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-mujer
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-Sexo entrevistado
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-0<br>1
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-Hombre<br>Mujer
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-4
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-edadcat
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-Tramos de edad
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-1<br>2<br>3<br>4
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-18 a 24 años<br>25 a 44 años<br>45 a 65 años<br>65 años o más
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-5
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-educ
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-Nivel educacional
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-1<br>2<br>3
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top;">
-Primaria<br>Secundaria<br>Post-secundaria
-</td>
-</tr>
-<tr>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-6
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-statusquo
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee">
-Escala de apoyo al status-quo
-</td>
-<td style="padding:0.2cm; text-align:left; vertical-align:top; background-color:#eeeeee" colspan="2">
-<em>range: -1.8-2.0</em>
-</td>
-</tr>
-</table>
-</div>
-<div id="guardar-datos" class="section level1" number="5">
-<h1 number="5"><span class="header-section-number">5</span> Guardar datos</h1>
-<pre class="r"><code>save(df_final,file = &quot;../input/data/proc/df_final.Rdata&quot;)</code></pre>
 </div>
 
 
@@ -2298,7 +1671,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeCodeFolding("show" === "show");
+  window.initializeCodeFolding("hide" === "show");
 });
 </script>
 
