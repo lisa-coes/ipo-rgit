@@ -6,18 +6,18 @@ link-citations: yes
 author: "T. Triviño"
 abstract: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Ut enimad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 output:
-  bookdown::html_document2:
-    number_sections: false
   bookdown::pdf_document2:
     template: null
     toc: false
+  bookdown::html_document2:
+    number_sections: false
 linkcolor: blue
 bibliography: input/bib/library.bib
 editor_options:
   chunk_output_type: console
 geometry: margin=0.78in
 header-includes:
-  # - \usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
+  - \usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
   - \usepackage{times}           # Times New Roman
   - \usepackage{caption}
   - \captionsetup[figure, table]{labelfont={bf},labelformat={default},labelsep=period}
@@ -33,7 +33,6 @@ header-includes:
   - \usepackage{pdflscape}
   - \usepackage{tabu}
   - \usepackage{threeparttable}
-lang: es  
 ---
 
 ```{r setup, include=FALSE}
@@ -144,11 +143,11 @@ custom.coef.names = c(
 custom.note = " $^{***}$p < 0,001;$^{**}$p < 0,01;$^{*}$p < 0,05. Errores estándar robustos entre paréntesis (HC2)"
 knitreg(list(m,m2),
        caption = paste("(\\#tab:model2)",cap),
-       center = TRUE,
+       caption.above = T,       
        custom.coef.names=custom.coef.names,
-       caption.above = T,
        custom.note = custom.note,
-       float.pos = "H",)
+       float.pos = "H",
+       booktabs = TRUE)
 ```
 
 Table \@ref(tab:model2) contrasta dos modelos de regresión
