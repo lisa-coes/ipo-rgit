@@ -3,12 +3,28 @@ title: "Lorem ipsum dolor sit amet"
 css: "input/css/custom.css"
 linestretch: '1.5'
 link-citations: yes
-author: "T. Triviño"
+author:
+- name: Duke A Caboom
+  affiliation: University of Tuktoyaktuk
+  email: dtholmes@mail.ubc.ca
+  number: 1
+- name: Justin d'Ottawa
+  affiliation: University of Ottawa
+  # email: justin@neverready.ca
+  number: 2
+- name: Pedro Torres
+  # affiliation: University of Ottawa
+  # email: pedrotorres@neverready.ca
+  number: 1,2
+# Nota: Autores que comparten filiacion, poner el mismo number y declarar filiación una sola vez.  
 abstract: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Ut enimad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 output:
   bookdown::pdf_document2:
     template: null
     toc: false
+    keep_tex: false
+    pandoc_args:
+      - --template=input/mytemplate.tex    
   bookdown::html_document2:
     number_sections: false
 linkcolor: blue
