@@ -1,8 +1,8 @@
 ---
 title: "Lorem ipsum dolor sit amet"
-css: "input/css/custom.css"
-linestretch: '1.5'
-link-citations: yes
+css: "input/css/custom.css" # custom CSS para html
+linestretch: '1.5'          # interlineado 
+link-citations: yes         # citas linkeadas
 author:
 - name: Duke A Caboom
   affiliation: University of Tuktoyaktuk
@@ -16,19 +16,19 @@ author:
 # Nota: Autores que comparten filiacion, poner el mismo number y declarar filiación una sola vez.  
 abstract: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Ut enimad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 output:
-  bookdown::html_document2:
-    number_sections: false
   bookdown::pdf_document2:
     template: null
     toc: false
     keep_tex: false
     pandoc_args:
       - --template=input/mytemplate.tex #custom template para usar autores con afiliacion  
+  bookdown::html_document2:
+    number_sections: false
 linkcolor: blue                         # enlaces y citas en color azul
 bibliography: input/bib/library.bib     # bibliografia en bibtex
 editor_options:
   chunk_output_type: console            # en RStudio, mostrar output en consola
-geometry: "left=3cm,right=3cm,top=2cm,bottom=2cm" # márgenes de página
+geometry: "left=2cm,right=2cm,top=3cm,bottom=3cm" # márgenes de página
 header-includes:
   - \usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
   - \usepackage{times}           # Times New Roman
@@ -107,7 +107,9 @@ $H_{3}$: Pertenecer a grupos con mayor logro educativo, se asocia con una mayor 
 # Resultados
 
 
-```{r biscuits, echo=FALSE, fig.cap = "Relación entre biscuits y tea", fig.align='center',fig.width=12,fig.height=10,out.width='80%'}
+> Para referencias una imagen generada en ggplot2 debemos fijar un label en el chunk: ` ```{r biscuits}` Luego, en el texto, usamos el tag `\@ref(fig:label)` como en el ejemplo:
+
+```{r biscuits, echo=FALSE, fig.cap = "Relación entre biscuits y tea", fig.align='center',fig.width=10,fig.height=8,out.width='50%'}
 tea <- rnorm(100)
 biscuits <- tea + rnorm(100, 0, 1.3)
 data <- data.frame(tea, biscuits) 
@@ -118,58 +120,72 @@ p <- ggplot(data, aes(x = tea, y = biscuits)) +
 print(p)
 ```
 
-Attending to the correlations between the variables as depicted in Figure \@ref(fig:biscuits) 
+Como podemos ver la correlación en la Figura \@ref(fig:biscuits) 
+
+> Para referencias una tabla generada en `knitr::kable()` debemos fijar un label en las opciones del chunk : ` ```{r modelo1}`. Luego, en el texto, usamos el tag `\@ref(tab:label)` como en el ejemplo:
 
 ```{r modelo01, echo=FALSE}
-data(efc)
-efc <- to_factor(efc, c161sex, e42dep, c172code)
-m   <- lm(neg_c_7 ~ pos_v_4 + c12hour + e42dep + c172code, data = efc)
-m2   <- lm(neg_c_7 ~ pos_v_4 + c12hour + e42dep , data = efc)
-broom::tidy(m) %>%
-  kable(format = table_format,
-        caption = "Tabla de regresión",
-        digits = 2,
-        booktabs=TRUE,
-        col.names = c("Variable","Coef.","SE","t","p")) %>%
-  kable_styling(full_width = fwidth)
+data(efc) # Cargar datos
+efc <- to_factor(efc, c161sex, e42dep, c172code) # convertir variables a factor
+m   <- lm(neg_c_7 ~ pos_v_4 + c12hour + e42dep + c172code, data = efc)# Modelo 1
+m2   <- lm(neg_c_7 ~ pos_v_4 + c12hour + e42dep , data = efc)         # Modelo 2
+broom::tidy(m) %>%                      # resumen de modelo en formato tidy
+  kable(format = table_format,          # formato de tabla ("html" o "latex")
+        caption = "Tabla de regresión", # Título de tabla
+        digits = 2,                     # decimales
+        booktabs= TRUE,                 # lineas horizontales de tabla
+        col.names = c("Variable","Coef.","SE","t","p")) %>% # etiquetas columnas
+  kable_styling(full_width = fwidth,                        # ancho de tabla
+                latex_options = c("HOLD_position")          # opciones de tabla pdf
+                )   
 ```
 
 
-Table \@ref(tab:modelo01) shows the results of the regression model. @Brady2014 lo enuncia. 
+La Tabla \@ref(tab:modelo01) muestra los resultados del modelo de regresión. @Brady2014 lo enuncia. 
+
+
+
+> En tablas que **NO SON** generadas con `knitr::kable()` debemos usar otro método:
+En este caso usamos: `paste("(\\#tab:model2)",cap)`, donde previamente definimos el objeto `cap` y luego usamos `paste0()` para unir ambos vectores de caracteres lo cual se debería ver así: `"(\\#tab:model2) Modelos de regresión para autos y sus partes."`
+
 
 ```{r results='asis'}
 cap <- "Modelos de regresión para autos y sus partes." # Titulo de tabla
-# Custom names para coeficientes: 
-custom.coef.names = c(                                                    
+custom.coef.names = c( # Custom names para coeficientes:                                                     
   "Intercept",
   "Positive value with 4 items",
   "average number of hours of care per week",
   "slightly dependent", "moderately dependent", "severely dependent",
   "intermediate level of education","high level of education"
   )
- # Custom footnote de tabla: 
-custom.note = " $^{***}$p < 0,001;$^{**}$p < 0,01;$^{*}$p < 0,05. Errores estándar robustos entre paréntesis (HC2)"
+# Custom footnote de tabla: 
+custom.note = "$^{***}$p < 0,001;$^{**}$p < 0,01;$^{*}$p < 0,05. Errores estándar robustos entre paréntesis (HC2)"
+# texreg::knitreg() decide si usar formato tabla html o latex según corresponda. 
 knitreg(list(m,m2),                            # Modelos 1 y 2
        caption = paste("(\\#tab:model2)",cap), # Label para crossref + titulo  
        caption.above = T,                      # Titulo de tabla arriba
        custom.coef.names=custom.coef.names,    # Definir custom names para coeficientes
        custom.note = custom.note,              # Definir footnote de tabla
-       float.pos = "H",                        # Fijar posición de tabla  
-       booktabs = TRUE)                        # Usar líneas horizontales en tabla
+       booktabs = TRUE,                        # Usar líneas horizontales en tabla
+       scalebox = 0.75,                         # tamaño de tabla a .75
+       float.pos = "hp!"
+       )                        
 ```
 
-Table \@ref(tab:model2) contrasta dos modelos de regresión
+
+Table \@ref(tab:model2) contrasta el Modelo 1 saturado, versus el Modelo 2 simplificado. 
 
 # Conclusiones
 
 # References
 
-<div id="refs"> </div>  <!-- Although <div> is an HTML tag, this method also works for other output formats such as PDF. -->
+<div id="refs"> </div>  <!-- Aunque <div> es tag HTML, este método funciona para otros formatos de salida como el PDF. -->
 
 # (APPENDIX) Appendix {-} 
 
-`r if (knitr::is_latex_output()){ '\\appendix'}` # Si documento es latex, se genera seccion de Anexos
-`r if (knitr::is_latex_output()){ '\\section{Appendix}'}` # Si documento es latex, se genera titulo de Anexos
+`r if (knitr::is_latex_output()){ '\\appendix'}`          <!-- Si documento es latex, se genera sección de Anexos -->
+`r if (knitr::is_latex_output()){ '\\section{Appendix}'}` <!-- Si documento es latex, se genera titulo de Anexos -->
+
 
 |                     | Sample  |   CEP  |
 |---------------------|:-------:|:------:|
@@ -187,4 +203,4 @@ Table \@ref(tab:model2) contrasta dos modelos de regresión
 | High school          | 43,23%  | 37,04% |
 | Non university      | 32,63%  | 28,93% |
 | university or more  | 21,21%  | 18,13% |
-Table: `r as.character(paste("(\\#tab:rep-samp)", "Representativeness of the sample"))`. # Label+titulo de tabla en syntax Markdown pura
+Table: `r as.character(paste("(\\#tab:rep-samp)", "Representativeness of the sample"))`. <!-- Label+titulo de tabla en syntax Markdown pura -->
