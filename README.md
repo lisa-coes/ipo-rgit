@@ -1,4 +1,4 @@
-# taller-git
+# ipo-rgit
 
 **Autor**: Laboratorio de Investigación Social Abierta.
 
