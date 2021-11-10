@@ -16,21 +16,20 @@ author:
 # Nota: Autores que comparten filiacion, poner el mismo number y declarar filiación una sola vez.  
 abstract: "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do *eiusmod tempor* incididunt ut labore et dolore magna aliqua. Ut enimad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
 output:
-  bookdown::html_document2:
-    number_sections: false
   bookdown::pdf_document2:
     template: null
     toc: false
     keep_tex: false
     pandoc_args:
       - --template=input/mytemplate.tex #custom template para usar autores con afiliacion  
+  bookdown::html_document2:
+    number_sections: false
 linkcolor: blue                         # enlaces y citas en color azul
 bibliography: input/bib/library.bib     # bibliografia en bibtex
 editor_options:
   chunk_output_type: console            # en RStudio, mostrar output en consola
 geometry: "left=2cm,right=2cm,top=3cm,bottom=3cm" # márgenes de página
 header-includes:
-  - \usepackage[spanish,es-tabla,es-nodecimaldot]{babel}
   - \usepackage{times}           # Times New Roman
   - \usepackage{caption}
   - \captionsetup[figure, table]{labelfont={bf},labelformat={default},labelsep=period}
