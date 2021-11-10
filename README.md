@@ -1,12 +1,12 @@
 # taller-git
 
-**Autor**: Julio César Iturra Sanhueza.
+**Autor**: Laboratorio de Investigación Social Abierta.
 
 ## Estructura del repositorio:
 ```
 │   LICENSE
 │   README.md
-│   taller-git.Rproj
+│   ipo-rgit.Rproj
 │   paper.Rmd
 │
 ├───input
