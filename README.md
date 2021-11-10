@@ -2,20 +2,9 @@
 
 **Autor**: Laboratorio de Investigación Social Abierta.
 
-## Estructura del repositorio:
-```
-│   LICENSE
-│   README.md
-│   ipo-rgit.Rproj
-│   paper.Rmd
-│
-├───input
-│       README-input.md
-│
-├───output
-│       README-output.md
-│
-└───production
-        README-prod.md
+Este repositorio contiene la plantilla del Protocolo IPO en su versión R+Git
 
-```
+Uso:
+
+* Para usuarios de GitHub recomendamos emplear la función
+<a class="btn btn-primary ml-2" href="/jciturras/ipo-rgit/generate">Use this template</a>
