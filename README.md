@@ -1,4 +1,4 @@
-# ipo-rgit <img src="https://deploy-preview-1--lisacoes.netlify.app/input/ipo-hex.png " alt=" " style="float: right;width: 20%;max-height: 100%" />
+# ipo-rgit <img src="https://deploy-preview-1--lisacoes.netlify.app/input/ipo-hex.png " align="right" alt="logo" style="float: right;width: 20%;max-height: 100%" />
 
 **Autor**: Laboratorio de Investigación Social Abierta.
 
