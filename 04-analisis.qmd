@@ -1,0 +1,8 @@
+---
+title: "04-analisis"
+format: html
+---
+
+# Análisis
+
+Todo lo que deriva del análisis va acá

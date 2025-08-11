@@ -1,0 +1,8 @@
+---
+title: "05-discussion"
+format: html
+---
+
+# Discusión
+
+Acá iría la discusión.
