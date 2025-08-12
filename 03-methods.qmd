@@ -1,0 +1,8 @@
+---
+title: "03-methods"
+format: html
+---
+
+# Data, variables & methods
+
+Todo lo relativo a variables, data y métodos debería ir acá.
