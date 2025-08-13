@@ -5,4 +5,4 @@ format: html
 
 # Data, variables & methods
 
-Todo lo relativo a variables, data y métodos debería ir acá.
+Todo lo relativo a variables, datos y métodos debería ir acá.

@@ -5,4 +5,4 @@ format: html
 
 # Análisis
 
-Todo lo que deriva del análisis va acá
+Todo lo que deriva del análisis va acá.
