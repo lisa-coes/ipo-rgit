@@ -5,4 +5,4 @@ format: html
 
 # Antecedentes
 
-Acá irán los antecedentes del trabajo
+Acá irán los antecedentes del trabajo. La justificación del problema, la discusión del tema en la literatura, etc.

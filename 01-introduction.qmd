@@ -5,4 +5,4 @@ format: html
 
 # Introducción
 
-Acá se inlcuye la introducción del trabajo
+Acá se inlcuye la introducción del trabajo a realizar.
